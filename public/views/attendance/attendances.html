@@ -1,0 +1,93 @@
+<div>
+
+    <h2>Attendances</h2>
+
+    <script type = "text/ng-template" id="attendance-save.html">
+        <form name="form" role="form" novalidate
+              class="ng-scope ng-invalid ng-invalid-required ng-dirty"
+              ng-submit="ok()">
+
+            <div class="modal-header">
+                <button type="button" class="close"
+                        ng-click="cancel()">&times;</button>
+                <h4 class="modal-title" id="myAttendanceLabel">Create or edit a Attendance</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>ID</label>
+                    <input type="text" class="form-control" name="id"
+                           ng-model="attendance.id" readonly>
+                </div>
+
+                
+                <div class="form-group">
+                    <label>alum_id:</label>
+                    
+                    <input type="number" class="form-control" name="alum_id"
+                           ng-model="attendance.alum_id" ng-required="true"
+                           />
+                    <span class="error" ng-show="form.alum_id.$error.min">Must be greater than or equal to .</span>
+                    <span class="error" ng-show="form.alum_id.$error.max">Must be less than or equal to .</span>
+                </div>
+                
+                <div class="form-group">
+                    <label>present:</label>
+                    
+                    <input type="number" class="form-control" name="present"
+                           ng-model="attendance.present" ng-required="true"
+                           />
+                    <span class="error" ng-show="form.present.$error.min">Must be greater than or equal to .</span>
+                    <span class="error" ng-show="form.present.$error.max">Must be less than or equal to .</span>
+                </div>
+                
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" ng-click="cancel()">Cancel
+                </button>
+                <button type="submit" ng-disabled="form.$invalid" class="btn btn-primary">Save</button>
+            </div>
+        </form>
+    </script>
+
+    <button class="btn btn-primary btn-lg" ng-click="create()">
+        <span class="glyphicon glyphicon-flash"></span> Create a new Attendance
+    </button>
+
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>ID</th>
+                
+                <th>alum_id</th>
+                
+                <th>present</th>
+                
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="attendance in attendances">
+                <td>{{attendance.id}}</td>
+                
+                <td>{{attendance.alum_id }}</td>
+                
+                <td>{{attendance.present }}</td>
+                
+                <td>
+                    <button type="submit"
+                            ng-click="update(attendance.id)"
+                            class="btn">
+                        <span class="glyphicon glyphicon-pencil"></span> Edit
+                    </button>
+                    <button type="submit"
+                            ng-click="delete(attendance.id)"
+                            class="btn btn-danger">
+                        <span class="glyphicon glyphicon-remove-circle"></span> Delete
+                    </button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

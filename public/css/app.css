@@ -1,0 +1,25 @@
+body {
+  margin-top: 60px;
+  padding: 10px;
+  background-color: #ECF0F1;
+}
+
+#csv-panel-body > div {
+	margin: 1em 0;
+}
+
+#csv-panel-body div.instructions {
+	display: none;
+	margin-left: 2em;
+}
+
+.progress {
+	-webkit-transition: all linear 0.5s;
+	transition: all linear 0.5s;
+}
+
+.progress.ng-hide {
+	display: block !important;
+	visibility: hidden;
+	opacity: 0;
+}
