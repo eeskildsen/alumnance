@@ -64,19 +64,23 @@
         </form>
     </script>
 	
-	<div class="row">
-		<div class="col-sm-1">
-			<label for="filter">Search:</label>
-		</div>
-		<div class="col-sm-11">
-			<input type="text" ng-model="filter" class="form-control" />
+	<div class="panel panel-default">
+		<div class="panel-body">
+			<div class="col-sm-1">
+				<label for="filter">Search:</label>
+			</div>
+			<div class="col-sm-11">
+				<input type="text" ng-model="filter" ng-model-options="{debounce: 500}" class="form-control" />
+			</div>
 		</div>
 	</div>
     
 	<div class="row">
-		<button class="btn btn-primary btn-lg" ng-click="create()">
-			<span class="glyphicon glyphicon-flash"></span> Create
-		</button>
+		<div class="col-sm-12">
+			<button class="btn btn-primary btn-lg" ng-click="create()">
+				<span class="glyphicon glyphicon-flash"></span> Create
+			</button>
+		</div>
 	</div>
 
     <div class="table-responsive">
@@ -96,12 +100,12 @@
             </tr>
             </thead>
             <tbody>
-            <tr dir-paginate="alum in alums | itemsPerPage: 10" total-items="totalAlums">
+            <tr dir-paginate="alum in alums | filter: filter | itemsPerPage: 10">
                 <td>{{alum.name }}</td>
                 
                 <td>{{alum.maiden_name }}</td>
                 
-                <td>{{getSchools(alum)}}</td>
+                <td>{{alum.schools}}</td>
                 
                 <td>{{alum.class_of }}</td>
                 
@@ -120,6 +124,6 @@
             </tr>
             </tbody>
         </table>
-		<dir-pagination-controls on-page-change="pageChanged(newPageNumber)"></dir-pagination-controls>
+		<dir-pagination-controls></dir-pagination-controls>
     </div>
 </div>

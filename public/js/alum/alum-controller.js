@@ -4,34 +4,9 @@ angular.module('alumnance')
   .controller('AlumController', ['$scope', '$modal', '$http', 'resolvedAlum', 'resolvedSchools', 'Alum',
     function ($scope, $modal, $http, resolvedAlum, resolvedSchools, Alum) {
 
-      $scope.alums = resolvedAlum.items;
-	  $scope.totalAlums = 0;
-	  getResultsPage(1);
+      $scope.alums = resolvedAlum;
 	  
 	  $scope.pagination = { current: 1 };
-	  
-	  $scope.pageChanged = function(newPage) {
-		getResultsPage(newPage);
-		$scope.pagination.current = newPage;
-	  }
-	  
-	  function getResultsPage(pageNumber) {
-		$http.get('/alumnance/alums?page=' + pageNumber).then(function(result) {
-			$scope.alums = result.data.items;
-			$scope.totalAlums = result.data.count;
-		});
-	  };
-	  
-	  $scope.getSchools = function(alum) {
-		if (typeof alum.schoolsString === 'undefined') {
-			var result = [];
-			angular.forEach(alum.schools, function(school) {
-				result.push(school.name);
-			});
-			alum.schoolsString = result.join(', ');
-		}
-		return alum.schoolsString;
-	  };
 
       $scope.create = function () {
         $scope.clear();
@@ -46,7 +21,7 @@ angular.module('alumnance')
       $scope.delete = function (id) {
         Alum.delete({id: id},
           function () {
-            getResultsPage($scope.pagination.current);
+            $scope.alums = Alum.query();
           });
       };
 
@@ -54,13 +29,13 @@ angular.module('alumnance')
         if (id) {
           Alum.update({id: id}, $scope.alum,
             function () {
-              getResultsPage($scope.pagination.current);
+              $scope.alums = Alum.query();
               $scope.clear();
             });
         } else {
           Alum.save($scope.alum,
             function () {
-			  getResultsPage($scope.pagination.current);
+			  $scope.alums = Alum.query();
               $scope.clear();
             });
         }
@@ -82,6 +57,8 @@ angular.module('alumnance')
       };
 
       $scope.open = function (id) {
+	  
+	    // Open the modal
         var alumSave = $modal.open({
           templateUrl: 'alum-save.html',
           controller: AlumSaveController,
@@ -93,6 +70,7 @@ angular.module('alumnance')
           }
         });
 
+		// Save the results
         alumSave.result.then(function (entity) {
           $scope.alum = entity;
           $scope.save(id);
@@ -105,10 +83,22 @@ var AlumSaveController =
     $scope.alum = alum;
 	$scope.resolvedSchools = resolvedSchools;
 	
+	// Find out which schools this alum belongs to
+	$scope.alum.$promise.then(function() {
+		var schoolNames = $scope.alum.schools.split(", ");
+		$scope.alum.schoolIds = [];
+		angular.forEach(resolvedSchools, function(school) {
+			var index = schoolNames.indexOf(school.name);
+			if (index > -1) {
+				$scope.alum.schoolIds.push(school.id);
+			}
+		});
+	});
+	
 	$scope.schoolIndex = function(id) {
-		if (typeof $scope.alum.schools !== 'undefined') {
-			for (var i = 0; i < $scope.alum.schools.length; i++) {
-				if ($scope.alum.schools[i].id === id) {
+		if (typeof $scope.alum.schoolIds !== 'undefined') {
+			for (var i = 0; i < $scope.alum.schoolIds.length; i++) {
+				if ($scope.alum.schoolIds[i] === id) {
 					return i;
 				}
 			}
@@ -119,9 +109,9 @@ var AlumSaveController =
     $scope.toggleSchool = function(school) {
 		var schoolIndex = $scope.schoolIndex(school.id);
 		if (schoolIndex > -1) {
-			$scope.alum.schools.splice(schoolIndex, 1);
+			$scope.alum.schoolIds.splice(schoolIndex, 1);
 		} else {
-			$scope.alum.schools.push(school);
+			$scope.alum.schoolIds.push(school.id);
 		}
 	}
 

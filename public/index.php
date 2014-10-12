@@ -152,36 +152,28 @@ $app->delete('/alumnance/schools/:id', function($id) use($app) {
 
 
 $app->get('/alumnance/alums', function() use($app) {
-
-	// Determine whether to start at a certain page of alum results
-	$page = ($app->request()->get('page') !== null) ? $app->request()->get('page') : 0;
-	
-	// Filter alums
-	$filter = $app->request()->get('filter');
-	
-	if (isset($filter)) {
-		$alums = Alum::where('name LIKE ?', array($filter));
-		$count = $alums->count();
-		$alums->skip(($page - 1) * 10)->take(10)->with('schools')->orderBy('name')->get();
-	} else {
-		$count = Alum::count();
-		$alums = Alum::skip(($page - 1) * 10)->take(10)->with('schools')->orderBy('name')->get();
-	}
-	
-    $result = [
-				'count' => $count,
-				'items' => $alums->toArray()
-			  ];
-	echo json_encode($result);
+	$sql = 'SELECT alums.id, alums.name, alums.maiden_name, alums.class_of, GROUP_CONCAT(schools.name, ", ") AS schools FROM alums LEFT JOIN alum_school ON alum_school.alum_id = alums.id LEFT JOIN schools ON schools.id = alum_school.school_id GROUP BY alums.name ORDER BY alums.name';
+	$statement = Capsule::connection()->getPdo()->query($sql);
+	$rows = $statement->fetchAll(PDO::FETCH_ASSOC);
+	echo json_encode($rows, JSON_NUMERIC_CHECK);
 });
 
 $app->get('/alumnance/alums/:id', function($id) use($app) {
-    $alum = Alum::with('schools')->find($id);
-    if (is_null($alum)) {
+
+	// Get the alum with the specified ID
+	$sql = 'SELECT alums.name, alums.maiden_name, alums.class_of, GROUP_CONCAT(schools.name, ", ") AS schools FROM alums LEFT JOIN alum_school ON alum_school.alum_id = alums.id LEFT JOIN schools ON schools.id = alum_school.school_id WHERE alums.id = :id GROUP BY alums.name';
+	$statement = Capsule::connection()->getPdo()->prepare($sql);
+	$statement->bindValue(':id', $id);
+	$statement->execute();
+	$alum = $statement->fetch(PDO::FETCH_ASSOC);
+
+	// 404 if an alum with the specified ID wasn't found
+    if ($alum === false) {
         $app->response->status(404);
         $app->stop();
     }
-    echo $alum->toJson();    
+	
+    echo json_encode($alum, JSON_NUMERIC_CHECK);
 });
 
 $app->post('/alumnance/alums', function() use($app) {
@@ -191,14 +183,7 @@ $app->post('/alumnance/alums', function() use($app) {
     
     $alum->name = $obj->{'name'};
     $alum->maiden_name = $obj->{'maiden_name'};
-	
-	// Get the IDs of the schools that this user attended
-	$schoolIds = [];
-	foreach ($obj->schools as $school) {
-		$schoolIds[] = $school->id;
-	}
-	
-    $alum->schools()->attach($schoolIds);
+    $alum->schools()->attach($obj->schoolIds);
     $alum->class_of = $obj->{'class_of'};
     $alum->save();
     $app->response->status(201);
@@ -216,14 +201,7 @@ $app->put('/alumnance/alums/:id', function($id) use($app) {
     
     $alum->name = $obj->{'name'};
     $alum->maiden_name = $obj->{'maiden_name'};
-	
-	// Get the IDs of the schools that this user attended
-	$schoolIds = [];
-	foreach ($obj->schools as $school) {
-		$schoolIds[] = $school->id;
-	}
-	
-    $alum->schools()->sync($schoolIds);
+    $alum->schools()->sync($obj->schoolIds);
     $alum->class_of = $obj->{'class_of'};
     $alum->save();
     echo $alum->toJson();    
