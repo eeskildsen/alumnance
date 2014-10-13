@@ -3,7 +3,7 @@
 angular.module('alumnance')
   .controller('AlumController', ['$scope', '$modal', '$http', 'resolvedAlum', 'resolvedSchools', 'Alum',
     function ($scope, $modal, $http, resolvedAlum, resolvedSchools, Alum) {
-
+	
       $scope.alums = resolvedAlum;
 	  
 	  $scope.pagination = { current: 1 };
@@ -17,6 +17,10 @@ angular.module('alumnance')
         $scope.alum = Alum.get({id: id});
         $scope.open(id);
       };
+	  
+	  $scope.updateAttendance = function(alum) {
+		Alum.update({id: alum.id}, alum);
+	  };
 
       $scope.delete = function (id) {
         Alum.delete({id: id},

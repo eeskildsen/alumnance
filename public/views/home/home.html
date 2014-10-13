@@ -24,9 +24,9 @@
 							<input type="file" ng-file-select="onFileSelect($files)">
 						</div>
 						<div class="col-sm-8">
-							<progressbar max="100" value="progress" ng-show="progress > 0 && progress < 100"></progressbar>
+							<progressbar max="100" value="progress" ng-show="state === 1"></progressbar>
+							<span ng-show="state === 2" ng-class="{'text-danger': isErrorMessage, 'text-info': !isErrorMessage}">{{ message }}</span>
 						</div>
-					</div>
 				</div>
 			</div>
         </div>

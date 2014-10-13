@@ -87,6 +87,8 @@
         <table class="table table-striped">
             <thead>
             <tr>
+				<th>Present</th>
+				
                 <th>Name</th>
                 
                 <th>Maiden Name</th>
@@ -101,6 +103,10 @@
             </thead>
             <tbody>
             <tr dir-paginate="alum in alums | filter: filter | itemsPerPage: 10">
+				<td>
+					<input type="checkbox" ng-model="alum.is_present" ng-click="updateAttendance(alum)">
+				</td>
+				
                 <td>{{alum.name }}</td>
                 
                 <td>{{alum.maiden_name }}</td>

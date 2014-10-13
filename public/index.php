@@ -39,10 +39,10 @@ $app->post('/alumnance/upload', function() use($app) {
 	// Make sure that a file was received and that it's really a CSV file
 	if (!isset($_FILES['file'])) {
 		$app->response->status(500);
-		echo json_encode(array('error' => 'The file didn\'t make it to the server.'));
+		echo json_encode(array('message' => 'The file didn\'t make it to the server.'));
 	} elseif (substr(strtolower($_FILES['file']['name']), -3) !== 'csv') {
 		$app->response->status(500);
-		echo json_encode(array('error' => 'That doesn\'t look like the right type of file. Please upload a CSV file.'));
+		echo json_encode(array('message' => 'That doesn\'t look like the right type of file. Please upload a CSV file.'));
 	} else {
 		
 		// Make sure the CSV file has the required number of columns
@@ -50,18 +50,17 @@ $app->post('/alumnance/upload', function() use($app) {
 		$firstRow = str_getcsv(array_shift($rows));
 		if (count($firstRow) < 4) {
 			$app->response->status(500);
-			echo json_encode(array('error' => 'That file doesn\'t have the right number of columns. Please upload a CSV file with 4 columns.'));
+			echo json_encode(array('message' => 'That file doesn\'t have the right number of columns. Please upload a CSV file with 4 columns.'));
 		} else {
 			
 			$existingSchools = [];
 			
 			
-			// Remove all old alums, schools, attendance records, and alum-to-school relations
+			// Remove all old alums, schools, and alum-to-school relations
 			Capsule::beginTransaction();
 			Alum::truncate();
 			AlumSchool::truncate();
 			School::truncate();
-			Attendance::truncate();
 			Capsule::commit();
 
 			Capsule::beginTransaction();
@@ -96,8 +95,28 @@ $app->post('/alumnance/upload', function() use($app) {
 				}
 			}
 			Capsule::commit();
+			
+			echo json_encode(array('message' => 'The data file was processed successfully.'));
 		}
 	}
+});
+
+$app->get('/alumnance/report', function() {
+	
+	// Get all alums, ordering by year
+	$sql = <<<'SQL'
+SELECT alums.class_of, alums.name, alums.maiden_name, GROUP_CONCAT(schools.name, ", ") AS schools
+FROM alums
+LEFT JOIN alum_school ON alum_school.alum_id = alums.id
+LEFT JOIN schools ON schools.id = alum_school.school_id
+WHERE alums.is_present = 1
+GROUP BY alums.id
+ORDER BY alums.class_of ASC
+SQL;
+	$statement = Capsule::connection()->getPdo()->query($sql);
+	$rows = $statement->fetchAll(PDO::FETCH_ASSOC|PDO::FETCH_GROUP);
+	
+	include implode(DIRECTORY_SEPARATOR, [__DIR__, 'views', 'report', 'index.php']);
 });
 
  
@@ -152,16 +171,17 @@ $app->delete('/alumnance/schools/:id', function($id) use($app) {
 
 
 $app->get('/alumnance/alums', function() use($app) {
-	$sql = 'SELECT alums.id, alums.name, alums.maiden_name, alums.class_of, GROUP_CONCAT(schools.name, ", ") AS schools FROM alums LEFT JOIN alum_school ON alum_school.alum_id = alums.id LEFT JOIN schools ON schools.id = alum_school.school_id GROUP BY alums.name ORDER BY alums.name';
+	$sql = 'SELECT alums.id, alums.is_present, alums.name, alums.maiden_name, alums.class_of, GROUP_CONCAT(schools.name, ", ") AS schools FROM alums LEFT JOIN alum_school ON alum_school.alum_id = alums.id LEFT JOIN schools ON schools.id = alum_school.school_id GROUP BY alums.name ORDER BY alums.name';
 	$statement = Capsule::connection()->getPdo()->query($sql);
 	$rows = $statement->fetchAll(PDO::FETCH_ASSOC);
-	echo json_encode($rows, JSON_NUMERIC_CHECK);
+	$json = json_encode($rows, JSON_NUMERIC_CHECK);
+	echo str_replace('"is_present":1', '"is_present":true', $json);
 });
 
 $app->get('/alumnance/alums/:id', function($id) use($app) {
 
 	// Get the alum with the specified ID
-	$sql = 'SELECT alums.name, alums.maiden_name, alums.class_of, GROUP_CONCAT(schools.name, ", ") AS schools FROM alums LEFT JOIN alum_school ON alum_school.alum_id = alums.id LEFT JOIN schools ON schools.id = alum_school.school_id WHERE alums.id = :id GROUP BY alums.name';
+	$sql = 'SELECT alums.name, alums.is_present, alums.maiden_name, alums.class_of, GROUP_CONCAT(schools.name, ", ") AS schools FROM alums LEFT JOIN alum_school ON alum_school.alum_id = alums.id LEFT JOIN schools ON schools.id = alum_school.school_id WHERE alums.id = :id GROUP BY alums.name';
 	$statement = Capsule::connection()->getPdo()->prepare($sql);
 	$statement->bindValue(':id', $id);
 	$statement->execute();
@@ -173,7 +193,8 @@ $app->get('/alumnance/alums/:id', function($id) use($app) {
         $app->stop();
     }
 	
-    echo json_encode($alum, JSON_NUMERIC_CHECK);
+    $json = json_encode($alum, JSON_NUMERIC_CHECK);
+	echo str_replace('"is_present":1', '"is_present":true', $json);
 });
 
 $app->post('/alumnance/alums', function() use($app) {
@@ -182,12 +203,14 @@ $app->post('/alumnance/alums', function() use($app) {
     $alum = new Alum;
     
     $alum->name = $obj->{'name'};
+	$alum->is_present = $obj->{'is_present'};
     $alum->maiden_name = $obj->{'maiden_name'};
     $alum->schools()->attach($obj->schoolIds);
     $alum->class_of = $obj->{'class_of'};
     $alum->save();
     $app->response->status(201);
-    echo $alum->toJson();    
+    $json = $alum->toJson();    
+	echo str_replace('"is_present":1', '"is_present":true', $json);
 });
 
 $app->put('/alumnance/alums/:id', function($id) use($app) {
@@ -200,11 +223,18 @@ $app->put('/alumnance/alums/:id', function($id) use($app) {
     }
     
     $alum->name = $obj->{'name'};
+	$alum->is_present = $obj->{'is_present'};
     $alum->maiden_name = $obj->{'maiden_name'};
-    $alum->schools()->sync($obj->schoolIds);
+	
+	// Update which schools this alum attended, unless we're just updating the alum's attendance
+	if (isset($obj->schoolIds)) {
+		$alum->schools()->sync($obj->schoolIds);
+	}
+		
     $alum->class_of = $obj->{'class_of'};
     $alum->save();
-    echo $alum->toJson();    
+	$json = $alum->toJson();
+    echo str_replace('"is_present":1', '"is_present":true', $json);
 });
 
 $app->delete('/alumnance/alums/:id', function($id) use($app) {
@@ -216,59 +246,6 @@ $app->delete('/alumnance/alums/:id', function($id) use($app) {
     $alum->delete();
     $app->response->status(204);
 });
-
-
-$app->get('/alumnance/attendances', function() {
-    $attendances = Attendance::all();
-    echo $attendances->toJson();
-});
-
-$app->get('/alumnance/attendances/:id', function($id) use($app) {
-    $attendance = Attendance::find($id);
-    if (is_null($attendance)) {
-        $app->response->status(404);
-        $app->stop();
-    }
-    echo $attendance->toJson();    
-});
-
-$app->post('/alumnance/attendances', function() use($app) {
-    $body = $app->request->getBody();
-    $obj = json_decode($body);
-    $attendance = new Attendance;
-    
-    $attendance->alum_id = $obj->{'alum_id'};
-    $attendance->present = $obj->{'present'};
-    $attendance->save();
-    $app->response->status(201);
-    echo $attendance->toJson();    
-});
-
-$app->put('/alumnance/attendances/:id', function($id) use($app) {
-    $body = $app->request->getBody();
-    $obj = json_decode($body);
-    $attendance = Attendance::find($id);
-    if (is_null($attendance)) {
-        $app->response->status(404);
-        $app->stop();
-    }
-    
-    $attendance->alum_id = $obj->{'alum_id'};
-    $attendance->present = $obj->{'present'};
-    $attendance->save();
-    echo $attendance->toJson();    
-});
-
-$app->delete('/alumnance/attendances/:id', function($id) use($app) {
-    $attendance = Attendance::find($id);
-    if (is_null($attendance)) {
-        $app->response->status(404);
-        $app->stop();
-    }
-    $attendance->delete();
-    $app->response->status(204);
-});
-
 
 
 $app->run();
