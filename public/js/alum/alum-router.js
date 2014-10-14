@@ -7,6 +7,7 @@ angular.module('alumnance')
         templateUrl: 'views/alum/alums.html',
         controller: 'AlumController',
         resolve:{
+		  auth: ['Auth', function(Auth) { return Auth.doRouteAuthentication(); }],
           resolvedAlum: ['Alum', function (Alum) {
             return Alum.query();
           }],

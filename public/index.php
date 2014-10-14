@@ -1,6 +1,10 @@
 <?php
 require '../vendor/autoload.php';
 
+/******************************************************************************************
+Set up Eloquent ORM
+******************************************************************************************/
+
 use Illuminate\Database\Capsule\Manager as Capsule;
 
 $capsule = new Capsule;
@@ -24,14 +28,31 @@ $capsule->setEventDispatcher(new Dispatcher(new Container));
 // Make this Capsule instance available globally via static methods... (optional)
 $capsule->setAsGlobal();
 
-// Setup the Eloquent ORM... (optional; unless you've used setEventDispatcher())
+// Set up the Eloquent ORM... (optional; unless you've used setEventDispatcher())
 $capsule->bootEloquent();
 
+/******************************************************************************************
+Set up Slim
+******************************************************************************************/
+
 $app = new \Slim\Slim();
+$app->add(new HttpVeryBasicAuth('alumnance', 'glaa1989!'));
+
+/******************************************************************************************
+Routes: non-model
+******************************************************************************************/
 
 $app->get('/', function() use ($app) {
     readfile('index.html');
     $app->stop();
+});
+
+$app->post('/alumnance/login', function() use($app) {
+	$body = $app->request->getBody();
+	$json = json_decode($body);
+	
+	$success = (strtolower($json->username) === 'alumnance' && $json->password === 'glaa1989!');
+	echo json_encode(['success' => $success]);
 });
 
 $app->post('/alumnance/upload', function() use($app) {
@@ -101,7 +122,7 @@ $app->post('/alumnance/upload', function() use($app) {
 	}
 });
 
-$app->get('/alumnance/report', function() {
+$app->get('/alumnance/report', function() use($app) {
 	
 	// Get all alums, ordering by year
 	$sql = <<<'SQL'
@@ -119,6 +140,9 @@ SQL;
 	include implode(DIRECTORY_SEPARATOR, [__DIR__, 'views', 'report', 'index.php']);
 });
 
+/******************************************************************************************
+Routes: School
+******************************************************************************************/
  
 $app->get('/alumnance/schools', function() {
     $schools = School::orderBy('name')->get();
@@ -169,6 +193,9 @@ $app->delete('/alumnance/schools/:id', function($id) use($app) {
     $app->response->status(204);
 });
 
+/******************************************************************************************
+Routes: Alum
+******************************************************************************************/
 
 $app->get('/alumnance/alums', function() use($app) {
 	$sql = 'SELECT alums.id, alums.is_present, alums.name, alums.maiden_name, alums.class_of, GROUP_CONCAT(schools.name, ", ") AS schools FROM alums LEFT JOIN alum_school ON alum_school.alum_id = alums.id LEFT JOIN schools ON schools.id = alum_school.school_id GROUP BY alums.name ORDER BY alums.name';

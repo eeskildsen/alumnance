@@ -6,19 +6,18 @@
 	}
 }
 
-#csv-panel-body > div {
-	margin: 1em 0;
-}
-
-#csv-panel-body div.instructions {
+div.instructions {
 	display: none;
-	margin-left: 2em;
+	margin: 2em;
+	padding: 2em;
+	border: 1px solid #DDD;
+	background-color: white;
 }
 
-table tbody tr.report-group > td {
+table#report tbody tr > td {
 	border: 0;
 }
 
-table tbody tr.report-group {
-	border-top: 1px solid #DDD;
+table#report tbody tr.report-group {
+	border-top: 1px solid #CCC;
 }

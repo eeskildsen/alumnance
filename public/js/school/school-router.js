@@ -7,6 +7,7 @@ angular.module('alumnance')
         templateUrl: 'views/school/schools.html',
         controller: 'SchoolController',
         resolve:{
+		  auth: ['Auth', function(Auth) { return Auth.doRouteAuthentication(); }],
           resolvedSchool: ['School', function (School) {
             return School.query();
           }]

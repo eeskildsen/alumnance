@@ -3,32 +3,53 @@
         <div class="col-md-12">
             <h1>Welcome to Alumnance!</h1>
             <p class="lead">Alumnance is an easy way to take <span class="text-primary">alumn</span>i attend<span class="text-primary">ance</span> at special events.</p>
-			<div class="panel panel-primary">
-				<div class="panel-heading">Upload CSV</div>
-				<div id="csv-panel-body" class="panel-body">
-					To get started, upload a CSV file containing all alumni in your alumni management system. <a slide-toggle-next-sibling>Show me how</a>
-					<div class="instructions row">
-						<div class="col-sm-12">
-							The CSV file should contain four columns:
-							<ol>
-								<li>Full Name</li>
-								<li>Maiden Name</li>
-								<li>School(s) Attended</li>
-								<li>Class Of</li>
-							</ol>
-							<div class="alert alert-info">A header row is required. The column names don't matter, but the order does.</div>
-						</div>
+			<p>To get started, upload a CSV file of all the alumni in eTapestry (or whatever your current alumni management system is). <button class="btn btn-default" slide-toggle-parents-next-sibling>Instructions</button></p>
+			<div class="instructions">
+					<div class="alert alert-warning">
+						<strong>NOTE:</strong> Uploading a CSV file <strong>erases any previous alumni records from Alumnance</strong>.
+						That usually doesn't matter since Alumnance is just for taking attendance, not archiving alumni records.
+						The only time it really concerns you is <em>while you're taking attendance</em> during an event.
+						You don't want to re-upload the CSV file then, because it will erase the attendance records you've entered!
 					</div>
-					<div class="row">
-						<div class="col-sm-4">
-							<input type="file" ng-file-select="onFileSelect($files)">
-						</div>
-						<div class="col-sm-8">
-							<progressbar max="100" value="progress" ng-show="state === 1"></progressbar>
-							<span ng-show="state === 2" ng-class="{'text-danger': isErrorMessage, 'text-info': !isErrorMessage}">{{ message }}</span>
-						</div>
+					<h3>If you're using eTapestry:</h3>
+					<ol>
+						<li>Sign in to eTapestry (<a href="https://bos.etapestry.com/prod/" target="_blank">click here to go to the sign-in page</a>).</li>
+						<li>Under <strong>Reports</strong> on the menu at the top of the page, click <strong>System</strong>.</li>
+						<li>Find the <strong>All Alumni</strong> report on the page (you may have to scroll down).</li>
+						<li>Click <strong>Run Report</strong> just underneath it.</li>
+						<li>Make sure that the selected query is <strong>All Alumni - A</strong>. Change it to that if it isn't set to it already.</li>
+						<li>Change the <strong>Report Format</strong> to <strong>CSV File - Download</strong>.</li>
+						<li>Click <strong>Submit</strong>.</li>
+						<li>Wait for the report to be generated and downloaded.</li>
+						<li>Log out of eTapestry unless you need it for something else.</li>
+						<li>Back in Alumnance (on this very page), click the button at the bottom to select a file.</li>
+						<li>Select the file that you just downloaded from eTapestry. If you're on Windows, it's probably in your <strong>Downloads</strong> folder, named something like <strong>AllAlumni</strong>.</li>
+						<li>Wait for the file to upload. After a moment, you should get a message saying the upload succeeded.</li>
+					</ol>
+					<h3>If you're using other alumni management software:</h3>
+					<p>Alumnance will work with any alumni management software that can export CSV files. The CSV file should have four columns:</p>
+					<ol>
+						<li>Full Name</li>
+						<li>Maiden Name</li>
+						<li>School(s) Attended</li>
+						<li>Class Of</li>
+					</ol>
+					<div class="alert alert-info">A header row is required. The column names don't matter, but the order does.</div>
+			</div>
+		</div>
+		<div class="panel panel-primary">
+			<div class="panel-heading">Upload CSV</div>
+			<div id="csv-panel-body" class="panel-body">
+				<div class="row">
+					<div class="col-sm-4">
+						<input type="file" ng-file-select="onFileSelect($files)">
+					</div>
+					<div class="col-sm-8">
+						<progressbar max="100" value="progress" ng-show="state === 1"></progressbar>
+						<span ng-show="state === 2" ng-class="{'text-danger': isErrorMessage, 'text-info': !isErrorMessage}">{{ message }}</span>
+					</div>
 				</div>
 			</div>
-        </div>
+		</div>
     </div>
 </div>

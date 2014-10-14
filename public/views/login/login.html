@@ -1,0 +1,24 @@
+<div class="container-fluid">
+	<div class="panel panel-default">
+		<div class="panel-heading">Log In</div>
+		<div class="panel-body">
+			<form role="form" ng-submit="logIn()">
+				<div class="alert alert-danger" ng-show="auth.loginState > 2">
+					<p ng-show="auth.loginState === 3">That username and password combination is incorrect.</p>
+					<p ng-show="auth.loginState === 4">The login server couldn't be reached. Make sure your Internet connection is up.</p>
+				</div>
+				<div class="form-group">
+					<label for="username">Username</label>
+					<input type="text" class="form-control" id="username" ng-model="username">
+				</div>
+				<div class="form-group">
+					<label for="password">Password</label>
+					<input type="password" class="form-control" id="password" ng-model="password">
+				</div>
+				<div class="form-group">
+					<input type="submit" class="btn btn-primary" value="Log In">
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
