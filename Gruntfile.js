@@ -10,8 +10,20 @@ module.exports = function (grunt) {
     yeoman: {
       // configurable paths
       app: require('./bower.json').appPath || 'public',
-      dist: 'public'
+      dist: 'build'
     },
+	concat: {
+		js: {
+			src: '<%= yeoman.app %>/js/**/*',
+			dest: '<%= yeoman.dist %>/js/concat.js'
+		},
+	},
+	min: {
+		js: {
+			src: '<%= yeoman.app %>/css/**/*',
+			dest: '<%= yeoman.dist %>/css/concat.css'
+		}
+	},
     sync: {
       dist: {
         files: [{
@@ -104,6 +116,8 @@ module.exports = function (grunt) {
       }
     }
   });
+  
+  grunt.loadNpmTasks('grunt-contrib-copy');
 
   grunt.registerTask('server', function (target) {
     grunt.task.run([
