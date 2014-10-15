@@ -154,9 +154,9 @@ module.exports = function (grunt) {
 			removeComments: true,
 			collapseWhitespace: true
 		},
-		files: {
+		files: [
 			'<%= yeoman.dist %>/index.html'
-		}
+		]
 	}
   });
   
