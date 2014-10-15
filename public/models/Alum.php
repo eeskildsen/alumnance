@@ -1,7 +1,5 @@
 <?php
 
-require_once '../vendor/autoload.php';
-
 class Alum extends Illuminate\Database\Eloquent\Model {
 
 	protected $fillable = ['name', 'maiden_name', 'class_of'];
