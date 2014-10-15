@@ -2,7 +2,7 @@
 	"baseName": "alumnance",
 	"databaseType": "sqlite",
 	"hostName": "localhost",
-	"databaseName": "/data/alumnance.db",
+	"databaseName": "/public/data/alumnance.db",
 	"userName": "",
 	"password": "",
 	"entities": [

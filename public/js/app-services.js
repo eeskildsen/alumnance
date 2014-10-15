@@ -32,7 +32,7 @@ angular.module('alumnance')
 				var self = this;
 				
 				// Ask the server whether these credentials are valid
-				var request = $http.post('/alumnance/login', {username: username, password: password});
+				var request = $http.post('alumnance/login', {username: username, password: password});
 				request.success(function(data) {
 					// Server returns success: true for good credentials
 					if (data.success) {

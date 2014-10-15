@@ -20,21 +20,21 @@ module.exports = function (grunt) {
 	concat: {
 		css: {
 			src: '<%= yeoman.app %>/css/**/*',
-			dest: '<%= yeoman.dist %>/css/concat.css'
+			dest: '<%= yeoman.dist %>/public/css/concat.css'
 		},
 		js: {
 			src: '<%= yeoman.app %>/js/**/*',
-			dest: '<%= yeoman.dist %>/js/concat.js'
+			dest: '<%= yeoman.dist %>/public/js/concat.js'
 		},
 	},
 	min: {
 		css: {
 			src: '<%= yeoman.app %>/css/**/*',
-			dest: '<%= yeoman.dist %>/css/concat.css'
+			dest: '<%= yeoman.dist %>/public/css/concat.css'
 		},
 		js: {
 			src: '<%= yeoman.app %>/js/**/*',
-			dest: '<%= yeoman.dist %>/js/concat.js'
+			dest: '<%= yeoman.dist %>/public/js/concat.js'
 		}
 	},
     sync: {
@@ -101,13 +101,21 @@ module.exports = function (grunt) {
     // Put files not handled in other tasks here
     copy: {
       dist: {
-        files: [{
-          expand: true,
-          dot: true,
-          cwd: '<%= yeoman.app %>',
-          dest: '<%= yeoman.dist %>',
-          src: '**'
-        }]
+        files: [
+			{
+			  expand: true,
+			  dot: true,
+			  cwd: '<%= yeoman.app %>',
+			  dest: '<%= yeoman.dist %>/public',
+			  src: ['**/*', '!**/lib/**']
+			},
+			{
+				expand: true,
+				cwd: '<%= yeoman.app %>/lib/bootstrap-css/fonts',
+				dest: '<%= yeoman.dist %>/public/fonts',
+				src: '**'
+			}
+		]
       },
     },
     // Test settings
@@ -130,7 +138,7 @@ module.exports = function (grunt) {
     },
 	useminPrepare: {
 		options: {
-			dest: '<%= yeoman.dist %>'
+			dest: '<%= yeoman.dist %>/public'
 		},
 		html: '<%= yeoman.app %>/index.html',
 		css: '<%= yeoman.app %>/index.html'
@@ -138,25 +146,27 @@ module.exports = function (grunt) {
 	rev: {
 		files: {
 			src: [
-				'<%= yeoman.dist %>/js/**/*.js',
-				'<%= yeoman.dist %>/css/**/*.css'
+				'<%= yeoman.dist %>/public/js/**/*.js',
+				'<%= yeoman.dist %>/public/css/**/*.css'
 			]
 		}
 	},
 	usemin: {
-		html: '<%= yeoman.dist %>/index.html',
+		html: '<%= yeoman.dist %>/public/index.html',
 		options: {
-			assetsDirs: ['<%= yeoman.dist %>/js', '<%= yeoman.dist %>/css']
+			assetsDirs: ['<%= yeoman.dist %>/public/js', '<%= yeoman.dist %>/public/css']
 		}
 	},
 	htmlmin: {
-		options: {
-			removeComments: true,
-			collapseWhitespace: true
-		},
-		files: [
-			'<%= yeoman.dist %>/index.html'
-		]
+		dist: {
+			options: {
+				removeComments: true,
+				collapseWhitespace: true
+			},
+			files: {
+				'<%= yeoman.dist %>/public/index.html': '<%= yeoman.dist %>/public/index.html'
+			}
+		}
 	}
   });
   
@@ -170,9 +180,7 @@ module.exports = function (grunt) {
 	'cssmin:generated',
 	'uglify:generated',
 	'copy:dist',
-	'rev',
-	'usemin',
-	'htmlmin'
+	'usemin'
   ]);
 
   grunt.registerTask('server', function (target) {

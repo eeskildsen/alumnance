@@ -66,7 +66,9 @@ class HttpVeryBasicAuth extends \Slim\Middleware {
     public function call() {
         $req = $this->app->request();
         $res = $this->app->response();
-        if (strtolower($_SERVER['PATH_INFO']) !== '/alumnance/login') {
+		
+		$path = strtolower($this->app->request->getResourceUri());
+        if ($path !== '/' && $path !== '/alumnance/login') {
             $authUser = $req->headers('PHP_AUTH_USER');
             $authPass = $req->headers('PHP_AUTH_PW');
 

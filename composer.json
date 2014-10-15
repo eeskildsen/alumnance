@@ -1,5 +1,8 @@
 {
-    "name": "alumnance",    
+    "name": "alumnance",
+	"config": {
+		"vendor-dir": "public/vendor"
+	},
     "require": {
         "php": ">=5.4.0",
         "slim/slim": "2.*",
@@ -9,11 +12,8 @@
     },
     "autoload": {
         "classmap": [
-			"auth",
-            "models"
+			"public/auth",
+            "public/models"
         ]
-    },
-    "config": {
-        "bin-dir": "bin/"
     }
 }

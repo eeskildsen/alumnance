@@ -1,5 +1,5 @@
 <?php
-require '../vendor/autoload.php';
+require 'vendor/autoload.php';
 
 /******************************************************************************************
 Set up Eloquent ORM
@@ -12,7 +12,7 @@ $capsule = new Capsule;
 $capsule->addConnection([
     'driver'    => 'sqlite',
     'host'      => 'localhost',
-    'database'  => implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'data', 'alumnance.db']),
+    'database'  => implode(DIRECTORY_SEPARATOR, [__DIR__, 'data', 'alumnance.db']),
     'username'  => '',
     'password'  => '',
     'charset'   => 'utf8',
@@ -36,7 +36,8 @@ Set up Slim
 ******************************************************************************************/
 
 $app = new \Slim\Slim();
-$app->add(new HttpVeryBasicAuth('alumnance', 'glaa1989!'));
+$auth = new HttpVeryBasicAuth('alumnance', 'glaa1989!');
+$app->add($auth);
 
 /******************************************************************************************
 Routes: non-model
@@ -47,11 +48,11 @@ $app->get('/', function() use ($app) {
     $app->stop();
 });
 
-$app->post('/alumnance/login', function() use($app) {
+$app->post('/alumnance/login', function() use($app, $auth) {
 	$body = $app->request->getBody();
 	$json = json_decode($body);
 	
-	$success = (strtolower($json->username) === 'alumnance' && $json->password === 'glaa1989!');
+	$success = $auth->authenticate(strtolower($json->username), $json->password);
 	echo json_encode(['success' => $success]);
 });
 
