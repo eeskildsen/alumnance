@@ -12,16 +12,29 @@ module.exports = function (grunt) {
       app: require('./bower.json').appPath || 'public',
       dist: 'build'
     },
+	clean: {
+		dist: {
+			src: '<%= yeoman.dist %>'
+		}
+	},
 	concat: {
+		css: {
+			src: '<%= yeoman.app %>/css/**/*',
+			dest: '<%= yeoman.dist %>/css/concat.css'
+		},
 		js: {
 			src: '<%= yeoman.app %>/js/**/*',
 			dest: '<%= yeoman.dist %>/js/concat.js'
 		},
 	},
 	min: {
-		js: {
+		css: {
 			src: '<%= yeoman.app %>/css/**/*',
 			dest: '<%= yeoman.dist %>/css/concat.css'
+		},
+		js: {
+			src: '<%= yeoman.app %>/js/**/*',
+			dest: '<%= yeoman.dist %>/js/concat.js'
 		}
 	},
     sync: {
@@ -114,10 +127,38 @@ module.exports = function (grunt) {
           'test/lib/angular-scenario': 'angular-scenario'
         }
       }
-    }
+    },
+	useminPrepare: {
+		options: {
+			dest: '<%= yeoman.dist %>'
+		},
+		html: '<%= yeoman.app %>/index.html',
+		css: '<%= yeoman.app %>/index.html'
+	},
+	rev: {
+		files: {
+			src: [
+				'<%= yeoman.dist %>/js/',
+				'<%= yeoman.dist %>/css/**/*'
+			]
+		}
+	}
   });
   
+  grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-copy');
+  
+  grunt.registerTask('build', [
+	'clean:dist',
+	'useminPrepare',
+	'concat:generated',
+	'cssmin:generated',
+	'uglify:generated',
+	'copy:dist',
+	'rev',
+	'usemin',
+	'htmlmin'
+  ]);
 
   grunt.registerTask('server', function (target) {
     grunt.task.run([
@@ -127,4 +168,6 @@ module.exports = function (grunt) {
       'watch'
     ]);
   });
+  
+  grunt.registerTask('default', ['build']);
 };

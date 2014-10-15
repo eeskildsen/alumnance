@@ -1,0 +1,23 @@
+@media screen {
+	body {
+	  margin-top: 60px;
+	  padding: 10px;
+	  background-color: #ECF0F1;
+	}
+}
+
+div.instructions {
+	display: none;
+	margin: 2em;
+	padding: 2em;
+	border: 1px solid #DDD;
+	background-color: white;
+}
+
+table#report tbody tr > td {
+	border: 0;
+}
+
+table#report tbody tr.report-group {
+	border-top: 1px solid #CCC;
+}
