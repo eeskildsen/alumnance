@@ -142,6 +142,21 @@ module.exports = function (grunt) {
 				'<%= yeoman.dist %>/css/**/*.css'
 			]
 		}
+	},
+	usemin: {
+		html: '<%= yeoman.dist %>/index.html',
+		options: {
+			assetsDirs: ['<%= yeoman.dist %>/js', '<%= yeoman.dist %>/css']
+		}
+	},
+	htmlmin: {
+		options: {
+			removeComments: true,
+			collapseWhitespace: true
+		},
+		files: {
+			'<%= yeoman.dist %>/index.html'
+		}
 	}
   });
   
