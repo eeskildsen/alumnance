@@ -31,6 +31,9 @@ $capsule->setAsGlobal();
 // Set up the Eloquent ORM... (optional; unless you've used setEventDispatcher())
 $capsule->bootEloquent();
 
+// Enable SQLite foreign key support
+$capsule->connection()->getPdo()->exec('PRAGMA foreign_keys=ON');
+
 /******************************************************************************************
 Set up Slim
 ******************************************************************************************/
