@@ -231,9 +231,11 @@ $app->post('/alumnance/alums', function() use($app) {
     $alum = new Alum;
     
     $alum->name = $obj->{'name'};
-	$alum->is_present = $obj->{'is_present'};
+	$alum->is_present = (isset($obj->is_present)) ? $obj->is_present : 0;
     $alum->maiden_name = $obj->{'maiden_name'};
-    $alum->schools()->attach($obj->schoolIds);
+	if (isset($obj->schoolIds)) {
+		$alum->schools()->attach($obj->schoolIds);
+	}
     $alum->class_of = $obj->{'class_of'};
     $alum->save();
     $app->response->status(201);
@@ -251,7 +253,7 @@ $app->put('/alumnance/alums/:id', function($id) use($app) {
     }
     
     $alum->name = $obj->{'name'};
-	$alum->is_present = $obj->{'is_present'};
+	$alum->is_present = (isset($obj->is_present)) ? $obj->is_present : 0;
     $alum->maiden_name = $obj->{'maiden_name'};
 	
 	// Update which schools this alum attended, unless we're just updating the alum's attendance
