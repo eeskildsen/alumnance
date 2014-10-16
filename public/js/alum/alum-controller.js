@@ -98,6 +98,8 @@ angular.module('alumnance')
 					}
 				});
 			});
+		} else {
+			$scope.alum.schoolIds = [];
 		}
 		
 		$scope.schoolIndex = function(id) {
