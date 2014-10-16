@@ -65,7 +65,7 @@ angular.module('alumnance')
 	    // Open the modal
         var alumSave = $modal.open({
           templateUrl: 'alum-save.html',
-          controller: AlumSaveController,
+          controller: 'AlumSaveController',
           resolve: {
             alum: function () {
               return $scope.alum;
@@ -80,50 +80,52 @@ angular.module('alumnance')
           $scope.save(id);
         });
       };
-    }]);
-
-var AlumSaveController =
-  function ($scope, $modalInstance, alum, resolvedSchools) {
-    $scope.alum = alum;
-	$scope.resolvedSchools = resolvedSchools;
-	
-	// Find out which schools this alum belongs to
-	$scope.alum.$promise.then(function() {
-		var schoolNames = $scope.alum.schools.split(", ");
-		$scope.alum.schoolIds = [];
-		angular.forEach(resolvedSchools, function(school) {
-			var index = schoolNames.indexOf(school.name);
-			if (index > -1) {
-				$scope.alum.schoolIds.push(school.id);
-			}
-		});
-	});
-	
-	$scope.schoolIndex = function(id) {
-		if (typeof $scope.alum.schoolIds !== 'undefined') {
-			for (var i = 0; i < $scope.alum.schoolIds.length; i++) {
-				if ($scope.alum.schoolIds[i] === id) {
-					return i;
+    }])
+	.controller('AlumSaveController', ['$scope', '$modalInstance', 'alum', 'resolvedSchools',
+		function ($scope, $modalInstance, alum, resolvedSchools) {
+		$scope.alum = alum;
+		$scope.resolvedSchools = resolvedSchools;
+		
+		// Find out which schools this alum belongs to
+		if ($scope.alum.$promise) {
+			$scope.alum.$promise.then(function() {
+				var schoolNames = $scope.alum.schools.split(", ");
+				$scope.alum.schoolIds = [];
+				angular.forEach(resolvedSchools, function(school) {
+					var index = schoolNames.indexOf(school.name);
+					if (index > -1) {
+						$scope.alum.schoolIds.push(school.id);
+					}
+				});
+			});
+		}
+		
+		$scope.schoolIndex = function(id) {
+			if (typeof $scope.alum.schoolIds !== 'undefined') {
+				for (var i = 0; i < $scope.alum.schoolIds.length; i++) {
+					if ($scope.alum.schoolIds[i] === id) {
+						return i;
+					}
 				}
 			}
+			return -1;
 		}
-		return -1;
-	}
 
-    $scope.toggleSchool = function(school) {
-		var schoolIndex = $scope.schoolIndex(school.id);
-		if (schoolIndex > -1) {
-			$scope.alum.schoolIds.splice(schoolIndex, 1);
-		} else {
-			$scope.alum.schoolIds.push(school.id);
+		$scope.toggleSchool = function(school) {
+			var schoolIndex = $scope.schoolIndex(school.id);
+			if (schoolIndex > -1) {
+				$scope.alum.schoolIds.splice(schoolIndex, 1);
+			} else {
+				$scope.alum.schoolIds.push(school.id);
+			}
 		}
-	}
 
-    $scope.ok = function () {
-      $modalInstance.close($scope.alum);
-    };
+		$scope.ok = function () {
+		  $modalInstance.close($scope.alum);
+		};
 
-    $scope.cancel = function () {
-      $modalInstance.dismiss('cancel');
-    };
-  };
+		$scope.cancel = function () {
+		  $modalInstance.dismiss('cancel');
+		};
+	  }
+	]);

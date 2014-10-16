@@ -51,7 +51,7 @@ angular.module('alumnance')
       $scope.open = function (id) {
         var schoolSave = $modal.open({
           templateUrl: 'school-save.html',
-          controller: SchoolSaveController,
+          controller: 'SchoolSaveController',
           resolve: {
             school: function () {
               return $scope.school;
@@ -64,19 +64,19 @@ angular.module('alumnance')
           $scope.save(id);
         });
       };
-    }]);
+    }])
+	.controller('SchoolSaveController', ['$scope', '$modalInstance', 'school',
+	  function ($scope, $modalInstance, school) {
+		$scope.school = school;
 
-var SchoolSaveController =
-  function ($scope, $modalInstance, school) {
-    $scope.school = school;
+		
 
-    
+		$scope.ok = function () {
+		  $modalInstance.close($scope.school);
+		};
 
-    $scope.ok = function () {
-      $modalInstance.close($scope.school);
-    };
-
-    $scope.cancel = function () {
-      $modalInstance.dismiss('cancel');
-    };
-  };
+		$scope.cancel = function () {
+		  $modalInstance.dismiss('cancel');
+		};
+	  }
+	]);
