@@ -3,6 +3,9 @@
 		<div class="panel-heading">Log In</div>
 		<div class="panel-body">
 			<form role="form" ng-submit="logIn()">
+				<div class="alert alert-info">
+					<p>You can log in with the username and password <strong>demo</strong>.</p>
+				</div>
 				<div class="alert alert-danger" ng-show="auth.loginState > 2">
 					<p ng-show="auth.loginState === 3">That username and password combination is incorrect.</p>
 					<p ng-show="auth.loginState === 4">The login server couldn't be reached. Make sure your Internet connection is up.</p>
