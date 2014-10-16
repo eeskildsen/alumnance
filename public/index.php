@@ -230,14 +230,12 @@ $app->post('/alumnance/alums', function() use($app) {
     $obj = json_decode($body);
     $alum = new Alum;
     
-    $alum->name = $obj->{'name'};
+    $alum->name = $obj->name;
 	$alum->is_present = (isset($obj->is_present)) ? $obj->is_present : 0;
-    $alum->maiden_name = $obj->{'maiden_name'};
-	if (isset($obj->schoolIds)) {
-		$alum->schools()->attach($obj->schoolIds);
-	}
-    $alum->class_of = $obj->{'class_of'};
+    $alum->maiden_name = $obj->maiden_name;
+    $alum->class_of = (isset($obj->class_of)) ? $obj->class_of : null;
     $alum->save();
+	$alum->schools()->attach($obj->schoolIds);
     $app->response->status(201);
     $json = $alum->toJson();    
 	echo str_replace('"is_present":1', '"is_present":true', $json);

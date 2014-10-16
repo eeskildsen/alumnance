@@ -37,6 +37,7 @@ angular.module('alumnance')
               $scope.clear();
             });
         } else {
+		  console.log('We are saving a NEW alum!');
           Alum.save($scope.alum,
             function () {
 			  $scope.alums = Alum.query();
@@ -56,7 +57,9 @@ angular.module('alumnance')
           
           "id": "",
 		  
-		  "schools": []
+		  "schools": [],
+		  
+		  "schoolIds": []
         };
       };
 
@@ -87,19 +90,20 @@ angular.module('alumnance')
 		$scope.resolvedSchools = resolvedSchools;
 		
 		// Find out which schools this alum belongs to
-		if ($scope.alum.$promise) {
+		if (typeof $scope.alum.$promise !== 'undefined') {
 			$scope.alum.$promise.then(function() {
-				var schoolNames = $scope.alum.schools.split(", ");
 				$scope.alum.schoolIds = [];
-				angular.forEach(resolvedSchools, function(school) {
-					var index = schoolNames.indexOf(school.name);
-					if (index > -1) {
-						$scope.alum.schoolIds.push(school.id);
-					}
-				});
+				
+				if ($scope.alum.schools !== null) {
+					var schoolNames = $scope.alum.schools.split(", ");
+					angular.forEach(resolvedSchools, function(school) {
+						var index = schoolNames.indexOf(school.name);
+						if (index > -1) {
+							$scope.alum.schoolIds.push(school.id);
+						}
+					});
+				}
 			});
-		} else {
-			$scope.alum.schoolIds = [];
 		}
 		
 		$scope.schoolIndex = function(id) {
@@ -112,6 +116,7 @@ angular.module('alumnance')
 			}
 			return -1;
 		}
+		
 
 		$scope.toggleSchool = function(school) {
 			var schoolIndex = $scope.schoolIndex(school.id);
@@ -123,6 +128,7 @@ angular.module('alumnance')
 		}
 
 		$scope.ok = function () {
+			console.log($scope.alum);
 		  $modalInstance.close($scope.alum);
 		};
 
