@@ -67075,20 +67075,11 @@ angular.module('alumnance')
     });
   }]);
 
-'use strict';
-
-angular.module('alumnance')
-  .controller('ReportController', ['$scope', '$timeout', '$route',
-    function ($scope, $timeout, $route) {
-		console.log('Loaded');
-		$route.reload();
-    }]);
 angular.module('alumnance')
 	.config(['$routeProvider', function($routeProvider) {
 		$routeProvider
 			.when('/report', {
 				templateUrl: 'alumnance/report',
-				controller: 'ReportController',
 				resolve: { auth: ['Auth', function(Auth) { return Auth.doRouteAuthentication(); }] }
 			});
 	}]);
