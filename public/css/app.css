@@ -6,6 +6,10 @@
 	}
 }
 
+#loading {
+    display: none;
+}
+
 div.instructions {
 	display: none;
 	margin: 2em;
